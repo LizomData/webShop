@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: transparent;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <title>Tencent Captcha</title>
+  <script src="https://turing.captcha.qcloud.com/TCaptcha.js"></script>
+</head>
+
+<body>
+
+  <script >
+    function globalCallback(res) {
+      if (window.FlutterJSBridge) {
+        window.FlutterJSBridge.postMessage(JSON.stringify(res));
+      }
+
+    }
+    function errorCallback() {
+      globalCallback({
+        ret: -1,
+        randstr: '@' + Math.random().toString(36).substr(2),
+        ticket: '',
+        errorCode: 1001,
+        errorMessage: 'jsload_error',
+      });
+    }
+    window.onload = function () {
+      try {
+        const sdkOptions = {
+          needFeedBack: false,
+          enableDarkMode: false,
+          loading: true,
+          ready: function (size) {
+            console.log('ready size:', JSON.stringify(size));
+          }
+        };
+        const captcha = new TencentCaptcha('199999861', globalCallback, sdkOptions);
+        captcha.show();
+      } catch (error) {
+        errorCallback();
+      }
+    }
+
+  </script>
+
+</body>
+
+</html>

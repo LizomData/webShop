@@ -1,0 +1,46 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="./loginPage.css">
+</head>
+
+<body>
+
+    <div style="display: flex; justify-content: center; margin-top: 50vh;">
+        <div class="wrapper">
+
+            <div class="">
+
+                <label class="switch">
+                    <input type="checkbox" class="toggle">
+                    <span class="slider"></span>
+                    <span class="card-side"></span>
+                    <div class="flip-card__inner">
+                        <div class="flip-card__front">
+                            <div class="title"> Log in</div>
+                            <form class="flip-card__form" action="/login" method="POST">
+                                <input class="flip-card__input" name="username" placeholder="Username">
+                                <input class="flip-card__input" name="password" placeholder="Password" type="password">
+                                <button class="flip-card__btn">登录</button>
+                            </form>
+                        </div>
+                        <div class="flip-card__back">
+                            <div class="title">Sign up</div>
+                            <form class="flip-card__form" action="/regist" method="POST">
+                                <input class="flip-card__input" name="name" placeholder="Your name">
+                                <input class="flip-card__input" name="username" placeholder="Username">
+                                <input class="flip-card__input" name="password" placeholder="Password" type="password">
+                                <button class="flip-card__btn">注册</button>
+                            </form>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+
+</html>
