@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import 'element-ui/lib/theme-chalk/index.css'
 import ElementUI from 'element-ui'
 import VueParticles from 'vue-particles'  
-
+import axios from "axios";
 
 import App from './App.vue'
 // import indexPage from '@/components/indexPage.vue'
@@ -46,6 +46,11 @@ const router =new VueRouter(
     routes
   }
 )
+Vue.prototype.axiosIns = axios.create({
+  baseURL: "/api",
+  tiemout: 5000,
+});
+
 Vue.use(VueRouter)
 Vue.use(ElementUI)
 Vue.use(VueParticles)

@@ -232,8 +232,9 @@
 <script>
 import MdiEye from "vue-material-design-icons/Eye.vue";
 import MdiEyeOff from "vue-material-design-icons/EyeOff.vue";
-import axios from "axios";
+
 import { People, Lock } from "@icon-park/vue";
+import axios from "axios";
 
 const ins = axios.create({
   baseURL: "/api",
@@ -308,15 +309,14 @@ export default {
           needFeedBack: true,
           enableDarkMode: false,
           loading: true,
-          ready: function (size) {
-            console.log("ready size:", JSON.stringify(size));
-          },
+          // ready: function (size) {
+          //   console.log("ready size:", JSON.stringify(size));
+          // },
         };
         const captcha = new window.TencentCaptcha(
           "199999861",
           (res) => {
-            console.log(res);
-            console.log(ins);
+           
             if (res.ret != 0) return;
             ins
               .post("/user/login", null, {
@@ -352,8 +352,7 @@ export default {
       }
     },
     globalCallback(res) {
-      console.log(res);
-      console.log(ins);
+   
       if (res.ret != 0) return;
       ins
         .post("/user/login", null, {
@@ -364,7 +363,6 @@ export default {
         })
         .then((res) => {
           // alert(res.data);
-          console.log(res);
           this.$message.success("登录成功");
           this.$router.push("/hw");
         });
@@ -405,14 +403,13 @@ export default {
           needFeedBack: false,
           enableDarkMode: false,
           loading: true,
-          ready: function (size) {
-            console.log("ready size:", JSON.stringify(size));
-          },
+          // ready: function (size) {
+          //   console.log("ready size:", JSON.stringify(size));
+          // },
         };
         const captcha = new window.TencentCaptcha(
           "199999861",
           (res) => {
-            console.log(res);
             if (res.ret != 0) return;
             ins
               .post("/user/register", null, {
@@ -423,7 +420,6 @@ export default {
               })
               .then((res) => {
                 // alert(res.data);
-                console.log(res);
                 if (res.data == "isexist") {
                   this.registData.regitsError = "注册失败：用户已存在!";
                   return;
