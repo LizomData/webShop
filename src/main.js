@@ -6,15 +6,11 @@ import VueParticles from 'vue-particles'
 import axios from "axios";
 
 import App from './App.vue'
-// import indexPage from '@/components/indexPage.vue'
 import TestPage from '@/components/test.vue'
 import hw from "@/components/HelloWorld.vue"
-// import ExPage from './components/exPage.vue'
-// import captchaPage from './components/captchaPage.vue'
-import LoginPage from './components/loginPage2.vue'
+import LoginPage from './components/loginPage.vue'
 import GoodsPage from './components/goodsPage.vue'
 import CartsPage from './components/cartsPage.vue'
-import CartsPage2 from './components/cartsPage2.vue'
 import OrdersPage from './components/ordersPage.vue'
 
 Vue.config.productionTip = false
@@ -28,10 +24,6 @@ const routes = [
   {
     path: '/goods',
     component: GoodsPage
-  },
-  {
-    path: '/carts2',
-    component: CartsPage2
   },
   {
     path: '/orders',
