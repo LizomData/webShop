@@ -340,8 +340,10 @@ export default {
                     this.loginData.password
                   );
                 }
-                this.$message.success(`登录成功:${res.data}`);
-                this.$router.push("/hw");
+                this.$message.success(`登录成功: ${this.loginData.username}`);
+                localStorage.setItem("userId", res.data);
+                localStorage.setItem("username", this.loginData.username);
+                this.$router.push("/goods");
               });
           },
           sdkOptions
@@ -351,31 +353,7 @@ export default {
         this.errorCallback();
       }
     },
-    globalCallback(res) {
    
-      if (res.ret != 0) return;
-      ins
-        .post("/user/login", null, {
-          params: {
-            name: this.loginData.username,
-            password: this.loginData.password,
-          },
-        })
-        .then((res) => {
-          // alert(res.data);
-          this.$message.success("登录成功");
-          this.$router.push("/hw");
-        });
-    },
-    errorCallback() {
-      this.globalCallback({
-        ret: -1,
-        randstr: "@" + Math.random().toString(36).substr(2),
-        ticket: "",
-        errorCode: 1001,
-        errorMessage: "jsload_error",
-      });
-    },
     rotate() {
       this.isRotating = !this.isRotating;
     },

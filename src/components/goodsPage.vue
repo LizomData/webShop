@@ -1,13 +1,5 @@
 <template>
   <div>
-    <div class="status">
-      <div class="title_bar">
-        <span class="title">首页</span>
-        <span class="title">商品</span>
-        <span class="title">购物车</span>
-        <span class="title-user">未登录</span>
-      </div>
-    </div>
     <div class="as-l-fullwidth" data-events="event52">
       <div>
         <div class="dd-fill-tertiary">
@@ -23,22 +15,36 @@
         </div>
       </div>
     </div>
-    <div class="search-container">
+    <!-- <div class="search-container">
       <input type="text" class="search-input" placeholder="请输入搜索内容" />
       <button class="search-button" onclick="searchFunction()">搜索</button>
+    </div>-->
+    <div class="search-container">
+      <el-input
+        v-model="searchQuery"
+        placeholder="搜索..."
+        suffix-icon="el-icon-search"
+        clearable
+        @input="handleSearch"
+        class="search-box"
+      ></el-input>
     </div>
     <div class="goodsTools">
       <div class="l_Right">
         <div class="w-Counter">
           <div class="w-Counter-inputa">
             <label>¥</label>
-            <input class="w-Counter-input" type="text" placeholder="最低价" />
+            <input class="w-Counter-input" type="text" placeholder="最低价" v-model="minPrice" />
             <label>-¥</label>
-            <input class="w-Counter-input" type="text" placeholder="最高价" />
+            <input class="w-Counter-input" type="text" placeholder="最高价" v-model="maxPrice" />
           </div>
           <div class="w-Counter-pannel">
-            <button class="button_small" style="margin-left: 6px;">清除</button>
-            <button class="button_small_main" style="margin-left: 7px; ">确定</button>
+            <button
+              class="button_small"
+              style="margin-left: 6px;"
+              @click="minPrice='' ; maxPrice='';filterByPrice();"
+            >清除</button>
+            <button class="button_small_main" style="margin-left: 7px; " @click="filterByPrice">确定</button>
           </div>
         </div>
         <div class="w-Select-Multi">
@@ -62,7 +68,7 @@
               <span class="price1">¥</span>
               <span class="price2">{{ item['price1'] }}</span>
             </div>
-            <label class="label-button">加入购物车</label>
+            <label class="label-button" @click="addToCart(item)">加入购物车</label>
           </div>
         </div>
       </div>
@@ -79,7 +85,10 @@ export default {
       goodsInfo_price_up: null,
       goodsInfo_price_down: null,
       sort_by: ["默认", "价格⬆", "价格⬇"],
-      cur_sort_by: "默认"
+      cur_sort_by: "默认",
+      searchQuery: "",
+      minPrice: "",
+      maxPrice: ""
     };
   },
   mounted() {
@@ -92,11 +101,43 @@ export default {
     });
   },
   methods: {
+    filterByPrice() {
+      var cur_goods = this.goodsInfo_origin;
+      if (this.cur_sort_by == this.sort_by[1])
+        cur_goods = this.goodsInfo_price_up;
+      if (this.cur_sort_by == this.sort_by[2])
+        cur_goods = this.goodsInfo_price_down;
+
+      this.goodsInfo =
+        this.minPrice === "" || this.maxPrice === ""
+          ? cur_goods
+          : cur_goods.filter(good => {
+              const min = parseFloat(this.minPrice);
+              const max = parseFloat(this.maxPrice);
+              return (
+                (isNaN(min) || good.price1 >= min) &&
+                (isNaN(max) || good.price1 <= max)
+              );
+            });
+    },
+    handleSearch() {
+      const query = this.searchQuery.toLowerCase();
+      var cur_goods = this.goodsInfo_origin;
+      if (this.cur_sort_by == this.sort_by[1])
+        cur_goods = this.goodsInfo_price_up;
+      if (this.cur_sort_by == this.sort_by[2])
+        cur_goods = this.goodsInfo_price_down;
+      this.goodsInfo = cur_goods.filter(good =>
+        good.name.toLowerCase().includes(query)
+      );
+    },
     switchSort(item) {
       this.cur_sort_by = item;
       if (item == this.sort_by[0]) this.goodsInfo = this.goodsInfo_origin;
       if (item == this.sort_by[1]) this.goodsInfo = this.goodsInfo_price_up;
       if (item == this.sort_by[2]) this.goodsInfo = this.goodsInfo_price_down;
+      this.handleSearch();
+      this.filterByPrice();
     },
     sortData() {
       var i, j, a, b, tem;
@@ -122,39 +163,35 @@ export default {
           }
         }
       }
+    },
+    addToCart(item) {
+      this.$confirm("是否将 " + item.name + " 添加到购物车？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.axiosIns
+            .post("/cart/add", null, {
+              params: {
+                userId: localStorage.getItem("userId"),
+                goodsId: item.id,
+                num: 1,
+                price: item.price1
+              }
+            })
+            .then(res => {
+              this.$message.success(item.name + "\n" + "加入购物车成功");
+              console.log(res);
+            });
+        })
+        .catch(() => {});
     }
   }
 };
 </script>
-<style>
-body {
-  background-color: #f5f5f7;
-}
-</style>
-<style scoped>
-.status {
-  display: flex;
-  width: calc(100vw -20%);
-  height: 50px;
-  background-color: #f5f5f7;
-  /* justify-content: space-between; */
-  align-items: center;
-  padding-left: 20%;
-}
-.title_bar {
-  display: flex;
-  width: calc(100vw - 20%);
-  gap: 50px;
-}
-.title {
-  font-size: 20px;
-}
 
-.title-user {
-  font-size: 20px;
-  position: absolute;
-  right: 10%;
-}
+<style scoped>
 .goods-container {
   display: flex;
   width: calc(100vw - 18% - 25px);
@@ -164,7 +201,7 @@ body {
   flex-wrap: wrap;
   background-color: white;
   border: 1px solid rgb(230, 230, 231);
-  box-shadow: 0 0 10px rgb(230, 230, 231);  
+  box-shadow: 0 0 10px rgb(230, 230, 231);
   border-top: none;
 
   /* justify-content: space-between; */
@@ -248,7 +285,7 @@ body {
   overflow: hidden;
   width: 100%;
 }
-.as-l-fullwidth div{
+.as-l-fullwidth div {
   display: block;
 }
 .dd-fill-tertiary {
@@ -271,132 +308,132 @@ body {
   content: " ";
   display: table;
 }
-.dd-holiday-animation-colors{
+.dd-holiday-animation-colors {
   opacity: 1;
-  transform: translate3d(0,0,0);
+  transform: translate3d(0, 0, 0);
 }
 .dd-holiday-animation-color {
-    filter: blur(20px);
-    position: absolute;
-    border-radius: 50%;
+  filter: blur(20px);
+  position: absolute;
+  border-radius: 50%;
 }
 .dd-holiday-animation-yellow {
-    width: 40%;
-    height: 50px;
-    background: #fd8c1f;
-    top: -30px;
-    right: 0;
-    animation: yellowAnimation 1.5s ease-out forwards .5s
+  width: 40%;
+  height: 50px;
+  background: #fd8c1f;
+  top: -30px;
+  right: 0;
+  animation: yellowAnimation 1.5s ease-out forwards 0.5s;
 }
 @keyframes yellowAnimation {
-    0% {
-        top: -75px;
-        right: 10vw
-    }
+  0% {
+    top: -75px;
+    right: 10vw;
+  }
 
-    50% {
-        top: -30px
-    }
+  50% {
+    top: -30px;
+  }
 
-    100% {
-        top: -30px;
-        right: 0
-    }
+  100% {
+    top: -30px;
+    right: 0;
+  }
 }
 
 .dd-holiday-animation-pink-one {
-    width: 90%;
-    height: 150px;
-    background: #ff3f98;
-    top: -135px;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    opacity: .5;
-    animation: pinkOneAnimation 2s ease-in-out forwards
+  width: 90%;
+  height: 150px;
+  background: #ff3f98;
+  top: -135px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  opacity: 0.5;
+  animation: pinkOneAnimation 2s ease-in-out forwards;
 }
 
 .dd-holiday-animation-pink-two {
-    width: 68%;
-    height: 150px;
-    background: #e9a5ff;
-    top: -135px;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    animation: pinkTwoAnimation 1.2s ease-in-out forwards
+  width: 68%;
+  height: 150px;
+  background: #e9a5ff;
+  top: -135px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  animation: pinkTwoAnimation 1.2s ease-in-out forwards;
 }
 
 @keyframes pinkOneAnimation {
-    0% {
-        top: -200px;
-        transform: scaleX(50%) translateX(0)
-    }
+  0% {
+    top: -200px;
+    transform: scaleX(50%) translateX(0);
+  }
 
-    25% {
-        top: -110px;
-        transform: scaleX(50%) translateX(0)
-    }
+  25% {
+    top: -110px;
+    transform: scaleX(50%) translateX(0);
+  }
 
-    50% {
-        top: -120px;
-        transform: scaleX(225%) translateX(10%)
-    }
+  50% {
+    top: -120px;
+    transform: scaleX(225%) translateX(10%);
+  }
 
-    100% {
-        top: -135px;
-        background: #e44cbb;
-        transform: scaleX(225%) translateX(0)
-    }
+  100% {
+    top: -135px;
+    background: #e44cbb;
+    transform: scaleX(225%) translateX(0);
+  }
 }
 @keyframes pinkTwoAnimation {
-    0% {
-        top: -200px;
-        transform: scaleX(50%) translateX(0)
-    }
+  0% {
+    top: -200px;
+    transform: scaleX(50%) translateX(0);
+  }
 
-    25% {
-        top: -120px;
-        transform: scaleX(70%) translateX(-10%)
-    }
+  25% {
+    top: -120px;
+    transform: scaleX(70%) translateX(-10%);
+  }
 
-    50% {
-        top: -130px;
-        transform: scaleX(225%) translateX(10%)
-    }
+  50% {
+    top: -130px;
+    transform: scaleX(225%) translateX(10%);
+  }
 
-    100% {
-        top: -135px;
-        background: #f55be4;
-        transform: scaleX(225%) translateX(0);
-        left: 0
-    }
+  100% {
+    top: -135px;
+    background: #f55be4;
+    transform: scaleX(225%) translateX(0);
+    left: 0;
+  }
 }
 .dd-holiday-animation-blue {
-    width: 60%;
-    height: 75px;
-    top: -50px;
-    left: 0;
-    background: #4186fd;
-    opacity: .5;
-    animation: blueAnimation 1s ease .2s forwards
+  width: 60%;
+  height: 75px;
+  top: -50px;
+  left: 0;
+  background: #4186fd;
+  opacity: 0.5;
+  animation: blueAnimation 1s ease 0.2s forwards;
 }
 @keyframes blueAnimation {
-    0% {
-        top: -100px;
-        transform: translateX(0)
-    }
+  0% {
+    top: -100px;
+    transform: translateX(0);
+  }
 
-    50% {
-        top: -50px;
-        transform: translateX(-15%)
-    }
+  50% {
+    top: -50px;
+    transform: translateX(-15%);
+  }
 
-    100% {
-        top: -50px;
-        background: #019ffb;
-        transform: translateX(0)
-    }
+  100% {
+    top: -50px;
+    background: #019ffb;
+    transform: translateX(0);
+  }
 }
 
 .dd-image {
@@ -409,7 +446,7 @@ body {
   min-width: 100vw;
   margin: 0 auto;
 }
-.search-container {
+/* .search-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -446,6 +483,19 @@ body {
 
 .search-button:hover {
   background-color: #45a049;
+} */
+.search-container {
+  display: flex;
+  justify-content: center; /* 居中搜索框 */
+  padding: 20px; /* 添加内边距 */
+  width: 50%;
+  margin: 0 auto;
+  transform: scale(1.2);
+}
+.search-box {
+  width: 100%;
+  max-width: 400px; /* 设置最大宽度 */
+  border-radius: 30px; /* 圆角边框 */
 }
 
 .goodsTools {
@@ -467,7 +517,6 @@ body {
   border: 1px solid rgb(230, 230, 231);
   /* box-shadow: 0 0 10px rgb(230, 230, 231); */
   /* border-bottom: none; */
-
 }
 .l_Right {
   margin: 0 25px 0 0;
@@ -494,18 +543,20 @@ body {
 }
 .w-Counter-inputa:hover ~ .w-Counter-pannel {
   opacity: 1;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 .w-Counter-inputa:focus ~ .w-Counter-pannel {
   opacity: 1;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 .w-Counter-input {
   border: 1px solid #e3e3e3;
-  border-color: #484b5f;
+  border-color: #ebebeb;
   border-radius: 2px;
   width: 56px;
   background: 0 0;
   /* background-color: #484b5f; */
-  color: #e4e8ee;
+  color: black;
   text-align: center;
   font-size: 12px;
   padding: 3px 6px;
@@ -515,15 +566,21 @@ body {
 }
 
 .w-Counter-input:focus {
-  border-color: #3f5d97;
+  border-color: #dad9d9;
   outline: 0;
-  color: #e4e8ee;
+  color: black;
+}
+
+.w-Counter-input:hover {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .w-Counter-pannel {
   display: block;
-
-  background: #f9f9f9;
+  border: 1px solid #e3e3e3;
+  border-color: #ebebeb;
+  border-radius: 2px;
+  background: white;
   width: 210px;
   padding: 54px 0 12px 15px;
   z-index: 35;
@@ -536,6 +593,7 @@ body {
 }
 .w-Counter-pannel:hover {
   opacity: 1;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .w-Counter-pannel .button_small {
@@ -584,10 +642,9 @@ body {
 
 .w-Select-Multi {
   display: flex;
-  color: #c6cad0;
-  border: none;
-  background: #2d2f3e;
-  width: 98px;
+  color: #888d94;
+  background: white;
+  width: 100px;
   position: relative;
   cursor: pointer;
 }
@@ -606,9 +663,13 @@ body {
   margin: auto 0;
   padding: 0 9px 0 9px;
   width: 79px;
+  border: 1px solid rgb(96, 98, 102);
+  border-color: #ebebeb;
+  border-radius: 2px;
+  outline: none;
 }
 .w-Select-Multi h3:hover {
-  background: #3c3d47;
+  background: #d2d6dfb9;
 }
 .w-Select-Multi h3:active {
   background: 0 0;
@@ -618,8 +679,8 @@ body {
 }
 
 .w-Select-Multi ul {
-  background: #2d2f3e;
-  top: 33px;
+  background: white;
+  top: 34px;
   border: none;
   left: 0;
   position: absolute;
@@ -631,6 +692,10 @@ body {
   padding: 0;
   opacity: 0;
   transition: opacity 0.3s ease;
+  border: 1px solid rgb(96, 98, 102);
+  border-color: #ebebeb;
+  border-radius: 2px;
+  color: #606266;
 }
 .w-Select-Multi ul:hover {
   opacity: 1;
@@ -638,16 +703,16 @@ body {
 .w-Select-Multi li {
   list-style: none;
   border-bottom: 1px solid #e3e3e3;
-  border-color: #373a4c;
+  border-color: #ebebeb;
 }
 .w-Select-Multi li:hover {
-  background: #3c3d47;
+  background: #d2d6dfb9;
 }
 .w-Select-Multi li:active {
   background: 0 0;
 }
 .w-Select-Multi li .on {
-  background: #3c3d47;
+  background: #d2d6dfb9;
 }
 .w-Select-Multi h6 {
   line-height: 32px;
@@ -667,7 +732,7 @@ body {
   background-position: -48px -262px;
   width: 6px;
   height: 6px;
-  color: #c6cad0;
+  color: #888d94;
   cursor: pointer;
   text-align: left;
   line-height: 50px;

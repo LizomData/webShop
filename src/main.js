@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import 'element-ui/lib/theme-chalk/index.css'
 import ElementUI from 'element-ui'
-import VueParticles from 'vue-particles'  
+import VueParticles from 'vue-particles'
 import axios from "axios";
 
 import App from './App.vue'
@@ -13,39 +13,70 @@ import hw from "@/components/HelloWorld.vue"
 // import captchaPage from './components/captchaPage.vue'
 import LoginPage from './components/loginPage2.vue'
 import GoodsPage from './components/goodsPage.vue'
+import CartsPage from './components/cartsPage.vue'
+import CartsPage2 from './components/cartsPage2.vue'
+import OrdersPage from './components/ordersPage.vue'
 
 Vue.config.productionTip = false
 
 
-const routes =[
+const routes = [
   {
-    path:'/',
-    component:GoodsPage
+    path: '/',
+    component: GoodsPage
   },
   {
-    path:'/login',
-    component:LoginPage
+    path: '/goods',
+    component: GoodsPage
   },
-    {
-      path:'/test',
-      
-      component:TestPage
-    },
-   
-    {
-      path:'/hw',
-      component:hw
-    },
+  {
+    path: '/carts2',
+    component: CartsPage2
+  },
+  {
+    path: '/orders',
+    component: OrdersPage
+  },
+  {
+    path: '/login',
+    component: LoginPage
+  },
+  {
+    path: '/carts',
+    component: CartsPage
+  },
 
-    
+  {
+    path: '/test',
+
+    component: TestPage
+  },
+
+  {
+    path: '/hw',
+    component: hw
+  },
+
+
 ]
 
-const router =new VueRouter(
+const router = new VueRouter(
   {
-    mode:"history",
+    mode: "history",
     routes
   }
 )
+// router.beforeEach((to, from, next) => {
+//   const isAuthenticated = localStorage.getItem('userId') !== null;
+
+//   if (to.path === '/login') {
+//     next();
+//   } else if (!isAuthenticated) {
+//     next('/login');
+//   } else {
+//     next();
+//   }
+// });
 Vue.prototype.axiosIns = axios.create({
   baseURL: "/api",
   tiemout: 5000,
