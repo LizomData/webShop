@@ -22,7 +22,9 @@
       <!-- 登录表单 -->
       <div class="login-form">
         <div class="logo">
-          <img src="https://www.guet.edu.cn/_upload/tpl/01/39/313/template313/images/logo.svg" />
+          <img
+            src="https://www.guet.edu.cn/_upload/tpl/01/39/313/template313/images/logo.svg"
+          />
           <!-- <span class="title">登 录</span> -->
         </div>
 
@@ -36,7 +38,9 @@
               { active: currentTab === tab.id },
             ]"
             @click="handleSwitchTab(tab.id)"
-          >{{ tab.name }}</div>
+          >
+            {{ tab.name }}
+          </div>
           <!-- <div  :class="['register-link',{active:currentTab === 'regist'}]" @click="currentTab = 'regist'">注册</div> -->
         </div>
 
@@ -55,7 +59,9 @@
               ]"
               @focus="loginData.loginError = ''"
             />
-            <div v-if="loginData.usernameError" class="error-message">{{ loginData.usernameError }}</div>
+            <div v-if="loginData.usernameError" class="error-message">
+              {{ loginData.usernameError }}
+            </div>
           </div>
 
           <div class="input-group">
@@ -84,12 +90,20 @@
                 <mdi-eye-off v-else class="icon" />
               </button>
             </div>
-            <div v-if="loginData.passwordError" class="error-message">{{ loginData.passwordError }}</div>
-            <div v-if="loginData.loginError" class="error-message">{{ loginData.loginError }}</div>
+            <div v-if="loginData.passwordError" class="error-message">
+              {{ loginData.passwordError }}
+            </div>
+            <div v-if="loginData.loginError" class="error-message">
+              {{ loginData.loginError }}
+            </div>
           </div>
           <div class="remember-password">
             <label class="checkbox-container">
-              <input type="checkbox" v-model="isRemembered" @click="rememberedUserHandle()" />
+              <input
+                type="checkbox"
+                v-model="isRemembered"
+                @click="rememberedUserHandle()"
+              />
               <span class="checkmark"></span>
               记住密码
             </label>
@@ -110,7 +124,9 @@
       <!-- 注册表单 -->
       <div class="regist-form">
         <div class="logo">
-          <img src="https://www.guet.edu.cn/_upload/tpl/01/39/313/template313/images/logo.svg" />
+          <img
+            src="https://www.guet.edu.cn/_upload/tpl/01/39/313/template313/images/logo.svg"
+          />
           <!-- <span class="title">注 册</span> -->
         </div>
 
@@ -124,7 +140,9 @@
               { active: currentTab === tab.id },
             ]"
             @click="handleSwitchTab(tab.id)"
-          >{{ tab.name }}</div>
+          >
+            {{ tab.name }}
+          </div>
           <!-- <div  :class="['register-link',{active:currentTab === 'regist'}]" @click="currentTab = 'regist'">注册</div> -->
         </div>
 
@@ -150,10 +168,9 @@
                 registData.registSuccess = '';
               "
             />
-            <div
-              v-if="registData.usernameError"
-              class="error-message"
-            >{{ registData.usernameError }}</div>
+            <div v-if="registData.usernameError" class="error-message">
+              {{ registData.usernameError }}
+            </div>
           </div>
 
           <div class="input-group">
@@ -188,15 +205,48 @@
                 <mdi-eye-off v-else class="icon" />
               </button>
             </div>
-            <div
-              v-if="registData.passwordError"
-              class="error-message"
-            >{{ registData.passwordError }}</div>
-            <div v-if="registData.regitsError" class="error-message">{{ registData.regitsError }}</div>
-            <div
-              v-if="registData.registSuccess"
-              class="success-message"
-            >{{ registData.registSuccess }}</div>
+            <div v-if="registData.passwordError" class="error-message">
+              {{ registData.passwordError }}
+            </div>
+            <div v-if="registData.regitsError" class="error-message">
+              {{ registData.regitsError }}
+            </div>
+            <div v-if="registData.registSuccess" class="success-message">
+              {{ registData.registSuccess }}
+            </div>
+          </div>
+
+          <div class="input-group">
+            <!-- 重复密码输入框 -->
+            <div class="password-input">
+              <Lock theme="filled" class="input-icon" />
+              <input
+                v-model="registData.confirmPassword"
+                :type="registData.showConfirmPassword ? 'text' : 'password'"
+                placeholder="请再次输入密码"
+                :class="[
+                  'input-field',
+                  {
+                    'has-error': registData.confirmPasswordError,
+                  },
+                ]"
+                @focus="registData.confirmPasswordError = ''"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                @click="
+                  registData.showConfirmPassword =
+                    !registData.showConfirmPassword
+                "
+              >
+                <mdi-eye v-if="registData.showConfirmPassword" class="icon" />
+                <mdi-eye-off v-else class="icon" />
+              </button>
+            </div>
+            <div v-if="registData.confirmPasswordError" class="error-message">
+              {{ registData.confirmPasswordError }}
+            </div>
           </div>
 
           <button type="submit" class="login-button">注册</button>
@@ -220,7 +270,7 @@ import axios from "axios";
 
 const ins = axios.create({
   baseURL: "/api",
-  timeout: 2000
+  timeout: 2000,
 });
 
 export default {
@@ -229,7 +279,7 @@ export default {
     MdiEye,
     MdiEyeOff,
     People,
-    Lock
+    Lock,
   },
   mounted() {
     var saveUser = localStorage.getItem("rememberedUsername");
@@ -253,26 +303,50 @@ export default {
         showPassword: false,
         usernameError: "",
         passwordError: "",
-        loginError: ""
+        loginError: "",
       },
       registData: {
         username: "",
         password: "",
+        confirmPassword: "",
         showPassword: false,
+        showConfirmPassword: false,
         usernameError: "",
         passwordError: "",
+        confirmPasswordError: "",
         regitsError: "",
-        registSuccess: ""
+        registSuccess: "",
       },
 
       tabs: [
         { id: "pwdLogin", name: "账号登录" },
 
-        { id: "regist", name: "注册" }
-      ]
+        { id: "regist", name: "注册" },
+      ],
     };
   },
+  watch: {
+    // 监听密码和确认密码的变化
+    "registData.password"(newPassword) {
+      this.validatePasswords();
+    },
+    "registData.confirmPassword"(newConfirmPassword) {
+      this.validatePasswords();
+    },
+  },
   methods: {
+    // 验证密码和确认密码是否一致
+    validatePasswords() {
+      if (this.registData.password && this.registData.confirmPassword) {
+        if (this.registData.password !== this.registData.confirmPassword) {
+          this.registData.confirmPasswordError = "两次输入的密码不一致";
+          return false;
+        } else {
+          this.registData.confirmPasswordError = "";
+          return true;
+        }
+      }
+    },
     rememberedUserHandle() {
       if (this.isRemembered) {
         localStorage.removeItem("rememberedUsername");
@@ -290,20 +364,20 @@ export default {
         const sdkOptions = {
           needFeedBack: true,
           enableDarkMode: false,
-          loading: true
+          loading: true,
         };
         const captcha = new window.TencentCaptcha(
           "199999861",
-          res => {
+          (res) => {
             if (res.ret != 0) return;
             ins
               .post("/user/login", null, {
                 params: {
                   name: this.loginData.username,
-                  password: this.loginData.password
-                }
+                  password: this.loginData.password,
+                },
               })
-              .then(res => {
+              .then((res) => {
                 if (res.data == "invalid") {
                   this.loginData.loginError = "账号或密码错误!";
                   return;
@@ -354,27 +428,28 @@ export default {
     handleRegigt() {
       this.registData.registSuccess = "";
       if (!this.vailForm(this.registData)) return;
+      if (!this.validatePasswords()) return;
       try {
         const sdkOptions = {
           needFeedBack: false,
           enableDarkMode: false,
-          loading: true
+          loading: true,
           // ready: function (size) {
           //   console.log("ready size:", JSON.stringify(size));
           // },
         };
         const captcha = new window.TencentCaptcha(
           "199999861",
-          res => {
+          (res) => {
             if (res.ret != 0) return;
             ins
               .post("/user/register", null, {
                 params: {
                   name: this.registData.username,
-                  password: this.registData.password
-                }
+                  password: this.registData.password,
+                },
               })
-              .then(res => {
+              .then((res) => {
                 // alert(res.data);
                 if (res.data == "isexist") {
                   this.registData.regitsError = "注册失败：用户已存在!";
@@ -396,8 +471,8 @@ export default {
       } catch (error) {
         this.errorCallback();
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
