@@ -5,10 +5,18 @@
         <div class="dd-fill-tertiary">
           <div class="dd-holiday-animation-container">
             <div class="dd-holiday-animation-colors">
-              <div class="dd-holiday-animation-yellow dd-holiday-animation-color"></div>
-              <div class="dd-holiday-animation-pink-one dd-holiday-animation-color"></div>
-              <div class="dd-holiday-animation-pink-two dd-holiday-animation-color"></div>
-              <div class="dd-holiday-animation-blue dd-holiday-animation-color"></div>
+              <div
+                class="dd-holiday-animation-yellow dd-holiday-animation-color"
+              ></div>
+              <div
+                class="dd-holiday-animation-pink-one dd-holiday-animation-color"
+              ></div>
+              <div
+                class="dd-holiday-animation-pink-two dd-holiday-animation-color"
+              ></div>
+              <div
+                class="dd-holiday-animation-blue dd-holiday-animation-color"
+              ></div>
             </div>
             <div class="dd-image"></div>
           </div>
@@ -34,41 +42,80 @@
         <div class="w-Counter">
           <div class="w-Counter-inputa">
             <label>¥</label>
-            <input class="w-Counter-input" type="text" placeholder="最低价" v-model="minPrice" />
+            <input
+              class="w-Counter-input"
+              type="text"
+              placeholder="最低价"
+              v-model="minPrice"
+            />
             <label>-¥</label>
-            <input class="w-Counter-input" type="text" placeholder="最高价" v-model="maxPrice" />
+            <input
+              class="w-Counter-input"
+              type="text"
+              placeholder="最高价"
+              v-model="maxPrice"
+            />
           </div>
           <div class="w-Counter-pannel">
             <button
               class="button_small"
-              style="margin-left: 6px;"
-              @click="minPrice='' ; maxPrice='';filterByPrice();"
-            >清除</button>
-            <button class="button_small_main" style="margin-left: 7px; " @click="filterByPrice">确定</button>
+              style="margin-left: 6px"
+              @click="
+                minPrice = '';
+                maxPrice = '';
+                filterByPrice();
+              "
+            >
+              清除
+            </button>
+            <button
+              class="button_small_main"
+              style="margin-left: 7px"
+              @click="filterByPrice"
+            >
+              确定
+            </button>
           </div>
         </div>
         <div class="w-Select-Multi">
           <h3>{{ cur_sort_by }}</h3>
           <i class="icon_drop"></i>
-          <ul style="width: 98px;">
-            <li v-for="(item , index) in sort_by" :key="index">
-              <h6 :class="{'on': item == cur_sort_by}" @click="switchSort(item)">{{ item }}</h6>
+          <ul style="width: 98px">
+            <li v-for="(item, index) in sort_by" :key="index">
+              <h6
+                :class="{ on: item == cur_sort_by }"
+                @click="switchSort(item)"
+              >
+                {{ item }}
+              </h6>
             </li>
           </ul>
         </div>
       </div>
     </div>
     <div class="goods-container">
-      <div class="good-container" v-for="(item,index) in goodsInfo" :key="index">
-        <img :src=" '/api/' + item['pthumbnail']" />
+      <div
+        class="good-container"
+        v-for="(item, index) in goodsInfo"
+        :key="index"
+      >
+        <img :src="'/api/' + item['pthumbnail']" />
         <div class="good-info">
-          <span class="name">{{ item['name'] }}</span>
-          <div style="display: flex; justify-content: space-between; align-items:center;">
+          <span class="name">{{ item["name"] }}</span>
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
             <div class="good-price">
               <span class="price1">¥</span>
-              <span class="price2">{{ item['price1'] }}</span>
+              <span class="price2">{{ item["price1"] }}</span>
             </div>
-            <label class="label-button" @click="addToCart(item)">加入购物车</label>
+            <label class="label-button" @click="addToCart(item)"
+              >加入购物车</label
+            >
           </div>
         </div>
       </div>
@@ -88,11 +135,11 @@ export default {
       cur_sort_by: "默认",
       searchQuery: "",
       minPrice: "",
-      maxPrice: ""
+      maxPrice: "",
     };
   },
   mounted() {
-    this.axiosIns.get("/goods/list").then(res => {
+    this.axiosIns.get("/goods/list").then((res) => {
       this.goodsInfo = JSON.parse(JSON.stringify(res.data));
       this.goodsInfo_origin = JSON.parse(JSON.stringify(res.data));
       this.goodsInfo_price_up = JSON.parse(JSON.stringify(res.data));
@@ -111,7 +158,7 @@ export default {
       this.goodsInfo =
         this.minPrice === "" || this.maxPrice === ""
           ? cur_goods
-          : cur_goods.filter(good => {
+          : cur_goods.filter((good) => {
               const min = parseFloat(this.minPrice);
               const max = parseFloat(this.maxPrice);
               return (
@@ -127,7 +174,7 @@ export default {
         cur_goods = this.goodsInfo_price_up;
       if (this.cur_sort_by == this.sort_by[2])
         cur_goods = this.goodsInfo_price_down;
-      this.goodsInfo = cur_goods.filter(good =>
+      this.goodsInfo = cur_goods.filter((good) =>
         good.name.toLowerCase().includes(query)
       );
     },
@@ -165,10 +212,19 @@ export default {
       }
     },
     addToCart(item) {
+      if (localStorage.getItem("userId") === null) {
+        this.$confirm("未登录，请先登录", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        })
+          .then(() => {})
+          .catch(() => {});
+        return;
+      }
       this.$confirm("是否将 " + item.name + " 添加到购物车？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           this.axiosIns
@@ -177,17 +233,17 @@ export default {
                 userId: localStorage.getItem("userId"),
                 goodsId: item.id,
                 num: 1,
-                price: item.price1
-              }
+                price: item.price1,
+              },
             })
-            .then(res => {
+            .then((res) => {
               this.$message.success(item.name + "\n" + "加入购物车成功");
               console.log(res);
             });
         })
         .catch(() => {});
-    }
-  }
+    },
+  },
 };
 </script>
 
